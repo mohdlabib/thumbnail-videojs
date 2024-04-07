@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+        integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.min.css">
+    <title>PRV</title>
+</head>
+
+<body id="body" data-spy="scroll" data-target=".navbar" data-offset="100">
+
+    <!-- loading -->
+    <div id="preloader-active">
+        <div class="preloader d-flex align-items-center justify-content-center">
+            <div class="preloader-inner position-relative">
+                <div class="preloader-circle"></div>
+                <div class="preloader-img pere-text">
+                    <img src="https://www.freepnglogos.com/uploads/logo-keren-png/kumpulan-hiu-logo-shark-6.png" alt="">
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /loading -->
+
+    <div class="scrollbar">
+        <div class="overflow">
+
+            <nav class="navbar navbar-light">
+                <div class="container">
+                    <a class="navbar-brand" href="#">
+                        <!-- <img src="assets/img/badass.png" > -->
+                    </a>
+                </div>
+            </nav>
+
+            <header class="masthead"></header>
+
+
+            <section class="search">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-6 mx-auto">
+                            <form class="form-search" action="">
+                                <input class="form-control shadow" type="text" name="search_box" id="search_box"
+                                    placeholder="Search ..." onkeyup="searchMovies()">
+                                <span><i class="input-icon fas fa-search"></i></span>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="movie">
+                <div class="container">
+
+                    <div id="dynamic_content" class="row"></div>
+
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+
+
+    <!-- JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous">
+    </script>
+    <script src="assets/js/scroll.js"></script>
+    <script>
+        $(window).on('load', function () {
+            $('#preloader-active').delay(450).fadeOut('slow');
+            $('body').delay(450).css({
+                'overflow': 'visible'
+            });
+        });
+    </script>
+    <script>
+        const serverURL = window.location.origin;
+        $(document).ready(function () {
+    
+            load_data();
+    
+            function load_data() {
+
+                $.ajax({
+                    url: serverURL + "/db/?apikey=asd", // Menggunakan API untuk mendapatkan data video dan thumbnail
+                    method: "GET",
+                    success: function (data) {
+                        var dynamic_content = $('#dynamic_content');
+                        dynamic_content.empty(); // Kosongkan konten sebelum menambahkan konten baru
+                        if (data && data.length > 0) {
+                            $.each(data, function (index, item) {
+                                var html = '<div class="col-lg-3 col-md-4 col-6">' +
+                                    '<a href="video.html?v=' + item.title + '">' +
+                                    '<div class="poster-movie">' +
+                                    '<img src="' + item.thumbnail + '" class="shadow">' +
+                                    '<div class="movie-title"><h6>' + item.title + '</h6></div>' + // Tambahkan judul di sini
+                                    '</div>' +
+                                    '</a>' +
+                                    '</div>';
+                                dynamic_content.append(html); // Tambahkan konten baru
+                            });
+                        } else {
+                            dynamic_content.append('<p>No Movies Found</p>');
+                        }
+                    },
+                    error: function () {
+                        $('#dynamic_content').html('<p>Failed to load data.</p>');
+                    }
+                });
+            }
+        });
+   
+        function searchMovies() {
+            var input, filter, dynamic_content, movies, title, i;
+            input = document.getElementById("search_box");
+            filter = input.value.toUpperCase();
+            dynamic_content = document.getElementById("dynamic_content");
+            movies = dynamic_content.getElementsByClassName("col-lg-3");
+    
+            for (i = 0; i < movies.length; i++) {
+                title = movies[i].getElementsByClassName("movie-title")[0].getElementsByTagName("h6")[0].innerText.toUpperCase(); // Mengambil judul film dari teks di dalam elemen h6
+                if (title.indexOf(filter) > -1) {
+                    movies[i].style.display = "";
+                } else {
+                    movies[i].style.display = "none";
+                }
+            }
+        }
+    </script>    
+    
+</body>
+
+</html>
