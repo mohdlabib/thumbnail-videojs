@@ -7,8 +7,11 @@ const cors = require('cors');
 
 
 const app = express();
-const videoFolder = 'public/videos';
-const thumbnailFolder = 'public/thumbnail';
+// const videoFolder = 'public/videos';
+// const thumbnailFolder = 'public/thumbnail';
+
+const videoFolder = 'media/devmon/asd/Data/Web-Stream/videos';
+const thumbnailFolder = 'media/devmon/asd/Data/Web-Stream/thumbnail';
 
 app.use(express.static('web'));
 app.use(express.static('public'));
