@@ -10,8 +10,8 @@ const app = express();
 // const videoFolder = 'public/videos';
 // const thumbnailFolder = 'public/thumbnail';
 
-const videoFolder = 'media/devmon/asd/Data/Web-Stream/videos';
-const thumbnailFolder = 'media/devmon/asd/Data/Web-Stream/thumbnail';
+const videoFolder = 'videos';
+const thumbnailFolder = 'thumbnail';
 
 app.use(express.static('web'));
 app.use(express.static('public'));
