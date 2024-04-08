@@ -7,11 +7,11 @@ const cors = require('cors');
 
 
 const app = express();
-// const videoFolder = 'public/videos';
-// const thumbnailFolder = 'public/thumbnail';
+const videoFolder = 'public/videos';
+const thumbnailFolder = 'public/thumbnail';
 
-const videoFolder = 'videos';
-const thumbnailFolder = 'thumbnail';
+// const videoFolder = 'videos';
+// const thumbnailFolder = 'thumbnail';
 
 app.use(express.static('web'));
 app.use(express.static('public'));
