@@ -58,8 +58,20 @@
             <section class="movie">
                 <div class="container">
 
+                    <div class="d-flex">
+                        <div class="p-2">
+                            <p class="text-white">Total video <span class="text-warning" id="jumlahVideo">0</span></p>
+                        </div>
+                        <div class="p-2 ml-auto">
+                            <p class="text-warning"><span id="videoRange"></span></p>
+                        </div>
+                    </div>
+
                     <div id="dynamic_content" class="row"></div>
 
+                    <nav class="pagination-custom">
+                        <ul id="pagination" class="pagination justify-content-center"></ul>
+                    </nav>
                 </div>
             </section>
 
@@ -84,59 +96,116 @@
     </script>
     <script>
         const serverURL = window.location.origin;
-        $(document).ready(function () {
-    
-            load_data();
-    
-            function load_data() {
+        var currentPage = 1;
+        var videosPerPage = 20;
+        var totalVideos;
+        let datas = [];
+        let totalPages;
 
-                $.ajax({
-                    url: serverURL + "/db/?apikey=asd", // Menggunakan API untuk mendapatkan data video dan thumbnail
-                    method: "GET",
-                    success: function (data) {
-                        var dynamic_content = $('#dynamic_content');
-                        dynamic_content.empty(); // Kosongkan konten sebelum menambahkan konten baru
-                        if (data && data.length > 0) {
-                            $.each(data, function (index, item) {
-                                var html = '<div class="col-lg-3 col-md-4 col-6">' +
-                                    '<a href="video.html?v=' + item.title + '">' +
-                                    '<div class="poster-movie">' +
-                                    '<img src="' + item.thumbnail + '" class="shadow">' +
-                                    '<div class="movie-title"><h6>' + item.title + '</h6></div>' + // Tambahkan judul di sini
-                                    '</div>' +
-                                    '</a>' +
-                                    '</div>';
-                                dynamic_content.append(html); // Tambahkan konten baru
-                            });
-                        } else {
-                            dynamic_content.append('<p>No Movies Found</p>');
-                        }
-                    },
-                    error: function () {
-                        $('#dynamic_content').html('<p>Failed to load data.</p>');
-                    }
-                });
-            }
+        load_data();
+
+        $("#search_box").on("keyup", function () {
+            var query = $(this).val().toLowerCase();
+            var filteredData = datas.filter(function (item) {
+                return item.title.toLowerCase().includes(query);
+            });
+            totalVideos = filteredData.length;
+            totalPages = Math.ceil(totalVideos / videosPerPage);
+            currentPage = 1; // Set currentPage to 1 when searching
+            displayPagination(totalPages);
+            displayVideos(currentPage, filteredData);
         });
-   
-        function searchMovies() {
-            var input, filter, dynamic_content, movies, title, i;
-            input = document.getElementById("search_box");
-            filter = input.value.toUpperCase();
-            dynamic_content = document.getElementById("dynamic_content");
-            movies = dynamic_content.getElementsByClassName("col-lg-3");
-    
-            for (i = 0; i < movies.length; i++) {
-                title = movies[i].getElementsByClassName("movie-title")[0].getElementsByTagName("h6")[0].innerText.toUpperCase(); // Mengambil judul film dari teks di dalam elemen h6
-                if (title.indexOf(filter) > -1) {
-                    movies[i].style.display = "";
-                } else {
-                    movies[i].style.display = "none";
+
+        function load_data() {
+            $.ajax({
+                url: serverURL + "/db/?apikey=asd",
+                method: "GET",
+                success: function (data) {
+                    datas = data;
+                    totalVideos = data.length;
+                    totalPages = Math.ceil(totalVideos / videosPerPage);
+                    displayPagination(totalPages);
+                    displayVideos(currentPage, data);
+                },
+                error: function () {
+                    $('#dynamic_content').html(
+                        '<p class="text-danger">Failed to load data.</p>');
                 }
+            });
+        }
+
+        function displayVideos(page, data) {
+            var start = (page - 1) * videosPerPage;
+            var end = start + videosPerPage;
+            var slicedData = data.slice(start, end);
+            var dynamic_content = $('#dynamic_content');
+            dynamic_content.empty();
+
+            $.each(slicedData, function (index, item) {
+                var html = '<div class="col-lg-3 col-md-4 col-6">' +
+                    '<a href="video.html?v=' + item.title + '">' +
+                    '<div class="poster-movie">' +
+                    '<img src="' + item.thumbnail + '" class="shadow">' +
+                    '<div class="movie-title"><h6>' + item.title + '</h6></div>' +
+                    '</div>' +
+                    '</a>' +
+                    '</div>';
+                dynamic_content.append(html);
+            });
+
+            // Menampilkan rentang video yang ditampilkan
+            var videoRangeStart = start + 1;
+            var videoRangeEnd = Math.min(end, totalVideos);
+            $('#videoRange').text(videoRangeStart + '-' + videoRangeEnd + ' of ' + totalVideos);
+        }
+
+        function displayPagination(totalPages) {
+            var pagination = $('#pagination');
+            $('#jumlahVideo').text(totalPages);
+            pagination.empty();
+
+            var prevButton = '<li class="page-item prev"><a class="page-link" ' + (currentPage == 1 ? ' disabled' :
+                '') + ' href="#" onclick="changePage(' + (currentPage - 1) +
+                ')">Previous</a></li>';
+
+            pagination.append(prevButton);
+
+            var startPage = Math.max(1, currentPage - 2);
+            var endPage = Math.min(startPage + 4, totalPages);
+
+            if (endPage - startPage < 4) {
+                startPage = Math.max(1, endPage - 4);
+            }
+
+            for (var i = startPage; i <= endPage; i++) {
+                var pageButton = '<li class="page-item ' + (currentPage === i ? 'active' : '') +
+                    '"><a class="page-link" onclick="changePage(' + i + ')">' + i + '</a></li>';
+                pagination.append(pageButton);
+            }
+
+            var nextButton = '<li class="page-item next"><a href="#" class="page-link ' + (currentPage === totalPages ?
+                    ' disabled' : '') + '" onclick="changePage(' + (currentPage + 1) +
+                ')">Next</a></li>';
+            pagination.append(nextButton);
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            var searchQuery = $("#search_box").val().toLowerCase();
+            if (searchQuery.trim() !== "") {
+                var filteredData = datas.filter(function (item) {
+                    return item.title.toLowerCase().includes(searchQuery);
+                });
+                totalVideos = filteredData.length;
+                displayVideos(page, filteredData);
+                displayPagination(Math.ceil(totalVideos / videosPerPage));
+            } else {
+                displayVideos(page, datas);
+                displayPagination(totalPages);
             }
         }
-    </script>    
-    
+    </script>
+
 </body>
 
 </html>

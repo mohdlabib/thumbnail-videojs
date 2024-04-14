@@ -160,18 +160,18 @@ body {
 
         img {
             border: 5px solid #d1abff;
-            width: 100%;
+            width: 200px;
             height: 250px;
             border-radius: 13px;
 
             @media only screen and (max-width: 390px) {
                 height: 190px;
-                width: 100%;
+                width: 120px;
             }
 
             @media only screen and (max-width: 600px) and (min-width: 390px) {
                 height: 260px;
-                width: 100%;
+                width: 200;
             }
 
         }
@@ -192,6 +192,8 @@ body {
         color: rgb(82, 82, 82);
         margin-right: 8px;
         font-weight: bolder;
+        background-color: transparent;
+        cursor: pointer;
     }
 
     .page-link:hover {
