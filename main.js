@@ -36,9 +36,10 @@ function createThumbnail(videoPath) {
     let newVideoName = videoName;
     let counter = 1;
 
-    if (ext !== '.mp4') {
-        newVideoName += `_${generateRandomLetters()}`;
-    }
+    // lagi error
+    // if (ext !== '.mp4') {
+    //     newVideoName += `_${generateRandomLetters()}`;
+    // }
 
 
     let data = [];
